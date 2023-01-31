@@ -1,3 +1,4 @@
+import sys; sys.path.append("..")
 import argparse
 import copy
 import random
@@ -25,7 +26,7 @@ from graphing.plot_att_all_over_time_across_agents import plot_att_all_over_time
 from graphing.plot_deltas_over_time_across_agents import plot_deltas_over_time_across_agents
 from graphing.plot_incidents_missed_over_time_across_agents import plot_incidents_missed_over_time_across_agents
 from graphing.plot_incidents_seen_over_time_across_agents import plot_incidents_seen_over_time_across_agents
-from graphing.plot_rews import plot_rets
+from graphing.plot_rews import plot_rews
 from graphing.plot_rew_over_time_across_agents import plot_rew_over_time_across_agents
 from graphing.plot_rew_terms_over_time_across_agents import plot_rew_terms_over_time_across_agents
 from graphing.plot_true_rates_over_time_across_agents import plot_true_rates_over_time_across_agents

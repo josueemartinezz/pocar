@@ -24,7 +24,7 @@ INCIDENT_RATES = [8, 6, 4, 3, 1.5]
 DYNAMIC_RATE = 0.1
 
 ########## PPO Train Parameters ##########
-TRAIN_TIMESTEPS = 10_000_000  # Total train time
+TRAIN_TIMESTEPS = 10_000  # Total train time
 LEARNING_RATE = 0.00001
 POLICY_KWARGS = dict(activation_fn=torch.nn.ReLU,
                      net_arch = [128, 128, dict(vf=[128, 64], pi=[128, 64])])  # actor-critic architecture
