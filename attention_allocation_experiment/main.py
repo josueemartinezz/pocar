@@ -1,3 +1,9 @@
+# import faulthandler
+
+# faulthandler.enable()
+
+import sys; sys.path.append('..')
+
 import argparse
 import copy
 import random
@@ -5,6 +11,7 @@ import time
 import os
 import shutil
 from pathlib import Path
+import sympy
 
 import numpy as np
 from sympy import E
@@ -25,7 +32,7 @@ from graphing.plot_att_all_over_time_across_agents import plot_att_all_over_time
 from graphing.plot_deltas_over_time_across_agents import plot_deltas_over_time_across_agents
 from graphing.plot_incidents_missed_over_time_across_agents import plot_incidents_missed_over_time_across_agents
 from graphing.plot_incidents_seen_over_time_across_agents import plot_incidents_seen_over_time_across_agents
-from graphing.plot_rews import plot_rets
+from graphing.plot_rews import plot_rews
 from graphing.plot_rew_over_time_across_agents import plot_rew_over_time_across_agents
 from graphing.plot_rew_terms_over_time_across_agents import plot_rew_terms_over_time_across_agents
 from graphing.plot_true_rates_over_time_across_agents import plot_true_rates_over_time_across_agents
@@ -53,7 +60,6 @@ def load_cpo_policy(model_path):
     policy = build_diag_gauss_policy(state_dim, policy_dims, action_dim)
 
     policy.to('cpu')
-
     ckpt = torch.load(model_path, map_location='cpu')
     policy.load_state_dict(ckpt['policy_state_dict'])
 
@@ -284,7 +290,7 @@ if __name__ == '__main__':
             train_cpo(env_list)
         else:
             train(train_timesteps=TRAIN_TIMESTEPS, env=env)
-        plot_rets(exp_path=EXP_DIR, save_png=True)
+        plot_rews(exp_path=EXP_DIR, save_png=True)
 
     if args.show_train_progress:
         plot_rews(exp_path=EXP_DIR, save_png=False)

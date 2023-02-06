@@ -13,10 +13,10 @@ EVAL_MODEL_PATHS = {
 
 }
 # CPO model paths to evaluate
-CPO_EVAL_MODEL_PATHS = {
-    # Sample model evaluation path
-    'CPO': 'cpo/save-dir/cpo_agent.pt'
-}
+# CPO_EVAL_MODEL_PATHS = {
+#     # Sample model evaluation path
+#     'CPO': 'cpo/save-dir/cpo_agent.pt'
+# }
 
 ########## Env Parameters ##########
 DELAYED_IMPACT_CLUSTER_PROBS = (
@@ -34,7 +34,7 @@ MAXIMIZE_REWARD = ThresholdPolicy.MAXIMIZE_REWARD
 EQUALIZE_OPPORTUNITY = ThresholdPolicy.EQUALIZE_OPPORTUNITY
 
 ########## PPO Train Parameters ##########
-TRAIN_TIMESTEPS = 10_000_000  # Total train time
+TRAIN_TIMESTEPS = 10  # Total train time
 LEARNING_RATE = 0.00001
 POLICY_KWARGS = dict(activation_fn=torch.nn.ReLU,
                      net_arch = [256, 256, dict(vf=[256, 128], pi=[256, 128])])

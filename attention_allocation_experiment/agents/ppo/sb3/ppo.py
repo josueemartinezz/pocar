@@ -15,6 +15,8 @@ from attention_allocation_experiment.config import REGULARIZE_ADVANTAGE, BETA_0,
 from attention_allocation_experiment.agents.ppo.sb3.on_policy_algorithm import OnPolicyAlgorithm
 
 
+# device = torch.device("to(device)" if torch.to(device).is_available() else "cpu")
+
 class PPO(OnPolicyAlgorithm):
     """
     Proximal Policy Optimization algorithm (PPO) (clip version)
@@ -60,7 +62,7 @@ class PPO(OnPolicyAlgorithm):
     :param policy_kwargs: additional arguments to be passed to the policy on creation
     :param verbose: the verbosity level: 0 no output, 1 info, 2 debug
     :param seed: Seed for the pseudo random generators
-    :param device: Device (cpu, cuda, ...) on which the code should be run.
+    :param device: Device (cpu, to(device), ...) on which the code should be run.
         Setting it to auto, the code will be run on the GPU if possible.
     :param _init_setup_model: Whether or not to build the network at the creation of the instance
     """
@@ -209,15 +211,15 @@ class PPO(OnPolicyAlgorithm):
                 if REGULARIZE_ADVANTAGE:
                     # Compute value-thresholding (vt) term as part of Eq. 3 from the paper
                     vt_term = torch.min(
-                        torch.zeros(rollout_data.deltas.shape[0]).cuda(),
+                        torch.zeros(rollout_data.deltas.shape[0]).to(device)(),
                         -rollout_data.deltas + torch.tensor(OMEGA, dtype=torch.float32)
                     )
 
                     # Compute decrease-in-violation (div) term as part of Eq. 3 from the paper
-                    div_cond = torch.where(rollout_data.deltas > torch.tensor(OMEGA, dtype=torch.float32).cuda(),
-                                                 torch.tensor(1, dtype=torch.float32).cuda(),
-                                                 torch.tensor(0, dtype=torch.float32).cuda())
-                    div_term = torch.min(torch.zeros(rollout_data.delta_deltas.shape[0]).cuda(),
+                    div_cond = torch.where(rollout_data.deltas > torch.tensor(OMEGA, dtype=torch.float32).to(device)(),
+                                                 torch.tensor(1, dtype=torch.float32).to(device)(),
+                                                 torch.tensor(0, dtype=torch.float32).to(device)())
+                    div_term = torch.min(torch.zeros(rollout_data.delta_deltas.shape[0]).to(device)(),
                                          -div_cond * rollout_data.delta_deltas)
 
                     # Bring the 3 terms to scale for numerical stability

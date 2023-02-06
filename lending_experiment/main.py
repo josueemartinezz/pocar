@@ -25,13 +25,14 @@ from lending_experiment.agents.human_designed_policies.classifier_agents import 
 from lending_experiment.agents.human_designed_policies.threshold_policies import ThresholdPolicy
 from lending_experiment.config import CLUSTER_PROBABILITIES, GROUP_0_PROB, BANK_STARTING_CASH, INTEREST_RATE, \
     CLUSTER_SHIFT_INCREMENT, BURNIN, MAXIMIZE_REWARD, EQUALIZE_OPPORTUNITY, EP_TIMESTEPS, NUM_GROUPS, EVAL_ZETA_0, \
-    EVAL_ZETA_1, TRAIN_TIMESTEPS, SAVE_DIR, EXP_DIR, POLICY_KWARGS, LEARNING_RATE, SAVE_FREQ, EVAL_MODEL_PATHS, \
-    CPO_EVAL_MODEL_PATHS
-from lending_experiment.agents.cpo.cpo import CPO
-from lending_experiment.agents.cpo.cpo_wrapper_env import CPOEnvWrapper
-from lending_experiment.agents.cpo.models import build_diag_gauss_policy, build_bernouilli_policy, build_mlp
-from lending_experiment.agents.cpo.simulators import SinglePathSimulator
-from lending_experiment.agents.cpo.torch_utils.torch_utils import get_device
+    EVAL_ZETA_1, TRAIN_TIMESTEPS, SAVE_DIR, EXP_DIR, POLICY_KWARGS, LEARNING_RATE, SAVE_FREQ, EVAL_MODEL_PATHS
+    #CPO_EVAL_MODEL_PATHS
+# from lending_experiment.agents.cpo.cpo import CPO
+# from lending_experiment.agents.cpo.cpo_wrapper_env import CPOEnvWrapper
+# from lending_experiment.agents.cpo.models import build_diag_gauss_policy, build_bernouilli_policy, build_mlp
+# from lending_experiment.agents.cpo.simulators import SinglePathSimulator
+# from lending_experiment.agents.cpo.torch_utils.torch_utils import get_device
+
 from lending_experiment.environments import params, rewards
 from lending_experiment.environments.lending import DelayedImpactEnv
 from lending_experiment.environments.lending_params import DelayedImpactParams, two_group_credit_clusters
@@ -55,63 +56,63 @@ print('Using device: ', device)
 torch.cuda.empty_cache()
 
 
-def load_cpo_policy(model_path):
-    policy_dims = [64, 64]
-    # (7) OHE of credit score + (2) group +  (2) TPRs of each group
-    state_dim = 11
-    action_dim = 1
+# def load_cpo_policy(model_path):
+#     policy_dims = [64, 64]
+#     # (7) OHE of credit score + (2) group +  (2) TPRs of each group
+#     state_dim = 11
+#     action_dim = 1
 
-    # policy = build_diag_gauss_policy(state_dim, policy_dims, action_dim)
-    policy = build_bernouilli_policy(state_dim, policy_dims, action_dim)
+#     # policy = build_diag_gauss_policy(state_dim, policy_dims, action_dim)
+#     policy = build_bernouilli_policy(state_dim, policy_dims, action_dim)
 
-    policy.to('cpu')
+#     policy.to('cpu')
 
-    ckpt = torch.load(model_path, map_location='cpu')
-    policy.load_state_dict(ckpt['policy_state_dict'])
+#     ckpt = torch.load(model_path, map_location='cpu')
+#     policy.load_state_dict(ckpt['policy_state_dict'])
 
-    return policy
-def train_cpo(env_list):
-    import sys
-    sys.path.insert(0,'cpo/')
+#     return policy
+# def train_cpo(env_list):
+#     import sys
+#     # sys.path.insert(0,'cpo/')
 
-    config = full_load(open('cpo_config.yaml', 'r'))['lending']
+    # config = full_load(open('cpo_config.yaml', 'r'))['lending']
 
-    n_episodes = config['n_episodes']
-    env_name = config['env_name']
-    n_episodes = config['n_episodes']
-    n_trajectories = config['n_trajectories']
-    trajectory_len = config['max_timesteps']
-    policy_dims = config['policy_hidden_dims']
-    vf_dims = config['vf_hidden_dims']
-    cf_dims = config['cf_hidden_dims']
-    max_constraint_val = config['max_constraint_val']
-    bias_red_cost = config['bias_red_cost']
-    device = get_device()
+    # n_episodes = config['n_episodes']
+    # env_name = config['env_name']
+    # n_episodes = config['n_episodes']
+    # n_trajectories = config['n_trajectories']
+    # trajectory_len = config['max_timesteps']
+    # policy_dims = config['policy_hidden_dims']
+    # vf_dims = config['vf_hidden_dims']
+    # cf_dims = config['cf_hidden_dims']
+    # max_constraint_val = config['max_constraint_val']
+    # bias_red_cost = config['bias_red_cost']
+    # device = get_device()
 
-    print(env_list[0].observation_space)
-    print(env_list[0].action_space)
-    print(env_list[0].reset())
-    state_dim = env_list[0].observation_space.shape[0]
-    # action_dim = env_list[0].action_space.n
-    action_dim = 1
+    # print(env_list[0].observation_space)
+    # print(env_list[0].action_space)
+    # print(env_list[0].reset())
+    # state_dim = env_list[0].observation_space.shape[0]
+    # # action_dim = env_list[0].action_space.n
+    # action_dim = 1
 
-    # policy = build_diag_gauss_policy(state_dim, policy_dims, action_dim)
-    policy = build_bernouilli_policy(state_dim, policy_dims, action_dim)
-    value_fun = build_mlp(state_dim + 1, vf_dims, 1)
-    cost_fun = build_mlp(state_dim + 1, cf_dims, 1)
+    # # policy = build_diag_gauss_policy(state_dim, policy_dims, action_dim)
+    # policy = build_bernouilli_policy(state_dim, policy_dims, action_dim)
+    # value_fun = build_mlp(state_dim + 1, vf_dims, 1)
+    # cost_fun = build_mlp(state_dim + 1, cf_dims, 1)
 
-    policy.to(device)
-    value_fun.to(device)
-    cost_fun.to(device)
+    # policy.to(device)
+    # value_fun.to(device)
+    # cost_fun.to(device)
 
-    simulator = SinglePathSimulator(env_list, policy, n_trajectories, trajectory_len)
+    # simulator = SinglePathSimulator(env_list, policy, n_trajectories, trajectory_len)
 
-    cpo = CPO(policy, value_fun, cost_fun, simulator, model_path='agents/cpo/save-dir/lending.pt',
-              bias_red_cost=bias_red_cost, max_constraint_val=max_constraint_val)
+    # cpo = CPO(policy, value_fun, cost_fun, simulator, model_path='agents/cpo/save-dir/lending.pt',
+    #           bias_red_cost=bias_red_cost, max_constraint_val=max_constraint_val)
 
-    print(f'Training policy {env_name} environment...\n')
+    # print(f'Training policy {env_name} environment...\n')
 
-    cpo.train(n_episodes)
+    # cpo.train(n_episodes)
 
 def train(train_timesteps, env):
 
@@ -197,12 +198,12 @@ def evaluate(env, agent, num_eps, num_timesteps, name, seeds, eval_path, algorit
 
 
             action = None
-            if algorithm == 'cpo':
-                action = int(agent(torch.FloatTensor(obs).squeeze()).sample().item())
-            else:
-                if isinstance(agent, PPO):
+            # if algorithm == 'cpo':
+            #     action = int(agent(torch.FloatTensor(obs).squeeze()).sample().item())
+            # else:
+            if isinstance(agent, PPO):
                     action = agent.predict(obs)[0]
-                else:
+            else:
                     action = agent.act(obs, done)
 
             # Logging
@@ -284,7 +285,7 @@ def display_eval_results(eval_dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument('--train', action='store_true')
-    parser.add_argument('--algorithm', type=str, default='ppo', choices=['ppo', 'cpo'])
+    #parser.add_argument('--algorithm', type=str, default='ppo', choices=['ppo', 'cpo'])
     parser.add_argument('--eval_path', dest='eval_path', type=str, default=None)
     parser.add_argument('--display_eval_path', dest='display_eval_path', type=str, default=None)
     parser.add_argument('--show_train_progress', action='store_true')
@@ -301,12 +302,12 @@ def main():
     env = DelayedImpactEnv(env_params)
 
     if args.train:
-        if args.algorithm == 'cpo':
-            n_trajectories = full_load(open('cpo_config.yaml', 'r'))['lending']['n_trajectories']
-            env_list = [CPOEnvWrapper(env=env, reward_fn=LendingReward, ep_timesteps=EP_TIMESTEPS) for _ in range(n_trajectories)]
-            train_cpo(env_list)
-        else:
-            train(train_timesteps=TRAIN_TIMESTEPS, env=env)
+        # if args.algorithm == 'cpo':
+        #     n_trajectories = full_load(open('cpo_config.yaml', 'r'))['lending']['n_trajectories']
+        #     env_list = [CPOEnvWrapper(env=env, reward_fn=LendingReward, ep_timesteps=EP_TIMESTEPS) for _ in range(n_trajectories)]
+        #     train_cpo(env_list)
+        # else:
+        train(train_timesteps=TRAIN_TIMESTEPS, env=env)
         plot_rets(exp_path=EXP_DIR, save_png=True)
 
     if args.show_train_progress:
@@ -349,16 +350,16 @@ def main():
                      eval_path=args.eval_path)
 
         # Evaluate CPO agent
-        for name, model_path in CPO_EVAL_MODEL_PATHS.items():
-            agent = load_cpo_policy(model_path)
-            evaluate(env=CPOEnvWrapper(env=env, reward_fn=LendingReward, ep_timesteps=eval_timesteps),
-                     agent=agent,
-                     num_eps=eval_eps,
-                     num_timesteps=eval_timesteps,
-                     name=name,
-                     seeds=seeds,
-                     eval_path=args.eval_path,
-                     algorithm='cpo')
+        # for name, model_path in CPO_EVAL_MODEL_PATHS.items():
+        #     agent = load_cpo_policy(model_path)
+        #     evaluate(env=CPOEnvWrapper(env=env, reward_fn=LendingReward, ep_timesteps=eval_timesteps),
+        #              agent=agent,
+        #              num_eps=eval_eps,
+        #              num_timesteps=eval_timesteps,
+        #              name=name,
+        #              seeds=seeds,
+        #              eval_path=args.eval_path,
+        #              algorithm='cpo')
 
         # Evaluate threshold policies
         for name, threshold_policy in zip(['EO', 'Greedy'], [EQUALIZE_OPPORTUNITY, MAXIMIZE_REWARD]):
