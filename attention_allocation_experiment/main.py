@@ -285,7 +285,7 @@ if __name__ == '__main__':
             train_cpo(env_list)
         else:
             train(train_timesteps=TRAIN_TIMESTEPS, env=env)
-        plot_rets(exp_path=EXP_DIR, save_png=True)
+        plot_rews(exp_path=EXP_DIR, save_png=True)
 
     if args.show_train_progress:
         plot_rews(exp_path=EXP_DIR, save_png=False)
