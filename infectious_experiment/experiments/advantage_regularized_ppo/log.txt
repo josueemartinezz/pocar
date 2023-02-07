@@ -1,0 +1,11 @@
+Logging to ./experiments/advantage_regularized_ppo/
+---------------------------------
+| rollout/           |          |
+|    ep_len_mean     | 20       |
+|    ep_rew_mean     | 2.4      |
+| time/              |          |
+|    fps             | 294      |
+|    iterations      | 1        |
+|    time_elapsed    | 6        |
+|    total_timesteps | 2048     |
+---------------------------------

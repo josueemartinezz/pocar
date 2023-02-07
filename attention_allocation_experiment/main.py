@@ -6,6 +6,7 @@ import time
 import os
 import shutil
 from pathlib import Path
+import sympy
 
 import numpy as np
 from sympy import E
@@ -54,7 +55,6 @@ def load_cpo_policy(model_path):
     policy = build_diag_gauss_policy(state_dim, policy_dims, action_dim)
 
     policy.to('cpu')
-
     ckpt = torch.load(model_path, map_location='cpu')
     policy.load_state_dict(ckpt['policy_state_dict'])
 

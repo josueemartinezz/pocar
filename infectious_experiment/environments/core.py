@@ -34,7 +34,7 @@ import gym.utils.json_utils
 import more_itertools
 import networkx as nx
 import numpy as np
-from recsim.simulator import recsim_gym
+# from recsim.simulator import recsim_gym
 import simplejson as json
 
 
@@ -115,10 +115,10 @@ class GymEncoder(json.JSONEncoder):
     if isinstance(obj, enum.Enum):
       return {'__enum__': str(obj)}
 
-    if isinstance(obj, recsim_gym.RecSimGymEnv):
-      # TODO(): We cannot serialize a full RecSimGymEnv but for now
-      # we can note its existence.
-      return 'RecSimGym'
+    # if isinstance(obj, recsim_gym.RecSimGymEnv):
+    #   # TODO(): We cannot serialize a full RecSimGymEnv but for now
+    #   # we can note its existence.
+    #   return 'RecSimGym'
 
     if isinstance(obj, np.ndarray):
       return obj.tolist()

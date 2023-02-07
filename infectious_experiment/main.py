@@ -1,5 +1,10 @@
+<<<<<<< HEAD
 import sys
 sys.append("..")
+=======
+import sys; sys.path.append('..')
+
+>>>>>>> 897a617efcae0e2ecfc88548d462b4ffb655057c
 import argparse
 import copy
 import os
